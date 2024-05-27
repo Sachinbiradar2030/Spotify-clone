@@ -18,61 +18,54 @@ function secondsToMinutesSeconds(seconds) {
 // Function to fetch and display songs from a folder
 async function getSongs(folder) {
     currfolder = folder;
-    //try {
-        // Fetch the list of songs from the folder
-        let response = await fetch(`/${folder}/`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch songs from ${folder}`);
+    let response = await fetch(`${folder}/`);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch songs from ${folder}`);
+    }
+    let text = await response.text();
+    let div = document.createElement("div");
+    div.innerHTML = text;
+    let anchors = div.getElementsByTagName("a");
+    song = [];
+    
+    // Filter out the mp3 files and store their names in the song array
+    for (let i = 0; i < anchors.length; i++) {
+        const element = anchors[i];
+        if (element.href.endsWith(".mp3")) {
+            song.push(element.href.split(`/${folder}/`)[1]);
         }
-        let text = await response.text();
-        let div = document.createElement("div");
-        div.innerHTML = text;
-        let anchors = div.getElementsByTagName("a");
-        song = [];
-        
-        // Filter out the mp3 files and store their names in the song array
-        for (let i = 0; i < anchors.length; i++) {
-            const element = anchors[i];
-            if (element.href.endsWith(".mp3")) {
-                song.push(element.href.split(`/${folder}/`)[1]);
-            }
-        }
+    }
 
-        // Display the list of songs in the UI
-        let songul = document.querySelector(".songlist ul");
-        songul.innerHTML = "";
-        for (const sang of song) {
-            songul.innerHTML += `<li>
-                <img src="spotify-img/music.svg" alt="">
-                <div class="info">
-                    <div>${decodeURIComponent(sang.replaceAll("%20", " "))}</div>
-                    <div>Song artist</div>
-                </div>
-                <div class="playnow">
-                    <span>Play now</span>
-                    <img src="spotify-img/play.svg" alt="">
-                </div>
-            </li>`;
-        }
+    // Display the list of songs in the UI
+    let songul = document.querySelector(".songlist ul");
+    songul.innerHTML = "";
+    for (const sang of song) {
+        songul.innerHTML += `<li>
+            <img src="spotify-img/music.svg" alt="">
+            <div class="info">
+                <div>${decodeURIComponent(sang.replaceAll("%20", " "))}</div>
+                <div>Song artist</div>
+            </div>
+            <div class="playnow">
+                <span>Play now</span>
+                <img src="spotify-img/play.svg" alt="">
+            </div>
+        </li>`;
+    }
 
-     // Add event listeners to play the song when clicked
-     Array.from(document.querySelector(".songlist").getElementsByTagName("li")).forEach(e => {
+    // Add event listeners to play the song when clicked
+    Array.from(document.querySelector(".songlist").getElementsByTagName("li")).forEach(e => {
         e.addEventListener("click", () => {
             playMusic(e.querySelector(".info").firstElementChild.innerHTML.trim());
-            
         });
     });
 
     return song; // Return the song array
-// } catch (error) {
-//     console.error(`Error fetching songs: ${error}`);
-//     return []; // Return an empty array if there's an error
-// }
 }
 
 // Function to play or pause the current song
 const playMusic = (track, pause = false) => {
-    currentsong.src = `/${currfolder}/` + track;
+    currentsong.src = `${currfolder}/` + track;
     if (!pause) {
         currentsong.play();
         document.getElementById("play").src = "spotify-img/pause.svg";
@@ -109,10 +102,10 @@ async function displayAlbums() {
 
                 cardcontainer.innerHTML += `
                     <div class="card" data-folder="${folderName}">
-                    <div class="play">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http:// www.w3.org/2000/svg">
+                        <div class="play">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http:// www.w3.org/2000/svg">
                                 <path d="M5 20V4L19 12L5 20Z" stroke="#141834" fill="#000" stroke-width="1.5" stroke-linejoin="round" />
-                                </svg>
+                            </svg>
                         </div>
 
                         <img src="/songs/${folderName}/cover.jpg" alt="${folderName} cover">
@@ -123,7 +116,6 @@ async function displayAlbums() {
                     </div>`;
             }
         }
-
 
         // Add event listeners to display songs when an album is clicked
         Array.from(document.getElementsByClassName("card")).forEach(e => {
@@ -141,6 +133,7 @@ async function displayAlbums() {
         console.error(`Error displaying albums: ${error}`);
     }
 }
+
 // Event listener for the hamburger menu to show the side menu
 document.querySelector(".ham").addEventListener("click", () => {
     document.querySelector(".left").style.left = "0";
@@ -210,8 +203,8 @@ document.querySelector(".volume>img").addEventListener("click", e=>{
         currentsong.volume = .10;
         document.querySelector(".range").getElementsByTagName("input")[0].value = 10;
     }
-
 })
+
 // Event listener to automatically play the next song when the current one ends
 currentsong.addEventListener("ended", () => {
     let index = song.indexOf(currentsong.src.split("/").pop());
@@ -233,5 +226,3 @@ async function main() {
 
 // Initialize the app
 main();
-
-
