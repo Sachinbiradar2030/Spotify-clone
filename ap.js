@@ -78,7 +78,7 @@ const playMusic = (track, pause = false) => {
 async function displayAlbums() {
     try {
         // Fetch the list of albums
-        let response = await fetch(`/songs/`);
+        let response = await fetch(`songs/`);
         if (!response.ok) {
             throw new Error('Failed to fetch album data');
         }
@@ -90,11 +90,11 @@ async function displayAlbums() {
         // Display the albums in the UI
         for (let i = 0; i < anchors.length; i++) {
             const anchor = anchors[i];
-            if (anchor.href.includes("/songs/")) {
-                let folderName = anchor.href.split("/songs/")[1].replace("/", "");
+            if (anchor.href.includes("songs/")) {
+                let folderName = anchor.href.split("songs/")[1].replace("/", "");
 
                 // Fetch the JSON file for each album
-                let jsonResponse = await fetch(`/songs/${folderName}/info.json`);
+                let jsonResponse = await fetch(`songs/${folderName}/info.json`);
                 if (!jsonResponse.ok) {
                     throw new Error(`Failed to fetch JSON for ${folderName}`);
                 }
@@ -103,12 +103,12 @@ async function displayAlbums() {
                 cardcontainer.innerHTML += `
                     <div class="card" data-folder="${folderName}">
                         <div class="play">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http:// www.w3.org/2000/svg">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M5 20V4L19 12L5 20Z" stroke="#141834" fill="#000" stroke-width="1.5" stroke-linejoin="round" />
                             </svg>
                         </div>
 
-                        <img src="/songs/${folderName}/cover.jpg" alt="${folderName} cover">
+                        <img src="songs/${folderName}/cover.jpg" alt="${folderName} cover">
                         <div class="album-info">
                             <h3>${jsonData.title}</h3>
                             <p>${jsonData.description}</p>
